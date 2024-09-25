@@ -1,0 +1,29 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Catalog {
+  id: ID!
+  name: String!
+  description: String!
+  stock: Int!
+  price: Float!
+  image: String!
+}
+
+input NewCatalog {
+  name: String!
+  description: String!
+  stock: Int!
+  price: Float!
+  image: String!
+}
+
+type Query {
+  catalogs: [Catalog!]!
+  catalog(id: ID!): Catalog!
+}
+
+type Mutation {
+  createCatalog(input: NewCatalog!): Catalog!
+}
