@@ -23,4 +23,8 @@ export class User {
   @Field()
   @Column({ type: "bool", default: true })
   isActive: boolean;
+
+  @Field(() => [String])
+  @Column({ type: "varchar", array: true, default: [] })
+  purchase: string[];
 }

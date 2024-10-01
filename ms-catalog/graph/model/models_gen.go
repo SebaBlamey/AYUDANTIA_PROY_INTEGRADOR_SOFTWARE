@@ -22,5 +22,10 @@ type NewCatalog struct {
 	Image       string  `json:"image"`
 }
 
+type PurchaseResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 type Query struct {
 }

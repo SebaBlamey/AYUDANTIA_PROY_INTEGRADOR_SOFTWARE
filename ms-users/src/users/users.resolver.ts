@@ -3,6 +3,7 @@ import { UsersService } from "./users.service";
 import { User } from "./entities/user.entity";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { PurchaseInput } from "./dto/purchase.input";
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -21,6 +22,13 @@ export class UsersResolver {
   @Mutation(() => User)
   async createUser(@Args("createUserDto") createUserDto: CreateUserDto) {
     return await this.usersService.create(createUserDto);
+  }
+
+  @Mutation(() => Boolean)
+  async purchaseCatalog(
+    @Args("purchaseCatalogInput") purchaseCatalogInput: PurchaseInput,
+  ) {
+    return await this.usersService.PurchaseCatalog(purchaseCatalogInput);
   }
 
   @Mutation(() => User)

@@ -3,7 +3,7 @@ import { UsersModule } from "./users/users.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./users/entities/user.entity";
 import { GraphQLModule } from "@nestjs/graphql";
-import { ApolloDriver } from "@nestjs/apollo";
+import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { join } from "path";
 import { UsersResolver } from "./users/users.resolver";
 import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
@@ -17,18 +17,19 @@ import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin
       password: "mypassword",
       database: "users_db",
       entities: [User],
+      port: 5433,
       autoLoadEntities: true,
       synchronize: true,
     }),
-    GraphQLModule.forRoot({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       playground: false,
       autoSchemaFile: join(process.cwd(), "src/schema.gql"),
-      plugin: [ApolloServerPluginLandingPageLocalDefault()],
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     UsersModule,
   ],
   controllers: [],
   providers: [UsersResolver],
 })
-export class AppModule {}
+export class AppModule { }

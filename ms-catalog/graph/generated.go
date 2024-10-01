@@ -57,7 +57,13 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateCatalog func(childComplexity int, input model.NewCatalog) int
+		CreateCatalog   func(childComplexity int, input model.NewCatalog) int
+		PurchaseCatalog func(childComplexity int, userID string, catalogID string, quantity int) int
+	}
+
+	PurchaseResponse struct {
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
 	}
 
 	Query struct {
@@ -68,6 +74,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateCatalog(ctx context.Context, input model.NewCatalog) (*model.Catalog, error)
+	PurchaseCatalog(ctx context.Context, userID string, catalogID string, quantity int) (*model.PurchaseResponse, error)
 }
 type QueryResolver interface {
 	Catalogs(ctx context.Context) ([]*model.Catalog, error)
@@ -146,6 +153,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateCatalog(childComplexity, args["input"].(model.NewCatalog)), true
+
+	case "Mutation.purchaseCatalog":
+		if e.complexity.Mutation.PurchaseCatalog == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_purchaseCatalog_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PurchaseCatalog(childComplexity, args["userId"].(string), args["catalogId"].(string), args["quantity"].(int)), true
+
+	case "PurchaseResponse.message":
+		if e.complexity.PurchaseResponse.Message == nil {
+			break
+		}
+
+		return e.complexity.PurchaseResponse.Message(childComplexity), true
+
+	case "PurchaseResponse.success":
+		if e.complexity.PurchaseResponse.Success == nil {
+			break
+		}
+
+		return e.complexity.PurchaseResponse.Success(childComplexity), true
 
 	case "Query.catalog":
 		if e.complexity.Query.Catalog == nil {
@@ -320,6 +353,92 @@ func (ec *executionContext) field_Mutation_createCatalog_argsInput(
 	}
 
 	var zeroVal model.NewCatalog
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_purchaseCatalog_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_purchaseCatalog_argsUserID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["userId"] = arg0
+	arg1, err := ec.field_Mutation_purchaseCatalog_argsCatalogID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["catalogId"] = arg1
+	arg2, err := ec.field_Mutation_purchaseCatalog_argsQuantity(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["quantity"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_purchaseCatalog_argsUserID(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["userId"]
+	if !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+	if tmp, ok := rawArgs["userId"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_purchaseCatalog_argsCatalogID(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["catalogId"]
+	if !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("catalogId"))
+	if tmp, ok := rawArgs["catalogId"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_purchaseCatalog_argsQuantity(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["quantity"]
+	if !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
+	if tmp, ok := rawArgs["quantity"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
 	return zeroVal, nil
 }
 
@@ -788,6 +907,155 @@ func (ec *executionContext) fieldContext_Mutation_createCatalog(ctx context.Cont
 	if fc.Args, err = ec.field_Mutation_createCatalog_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_purchaseCatalog(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_purchaseCatalog(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PurchaseCatalog(rctx, fc.Args["userId"].(string), fc.Args["catalogId"].(string), fc.Args["quantity"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PurchaseResponse)
+	fc.Result = res
+	return ec.marshalNPurchaseResponse2ᚖcatalogᚋgraphᚋmodelᚐPurchaseResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_purchaseCatalog(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_PurchaseResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_PurchaseResponse_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PurchaseResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_purchaseCatalog_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PurchaseResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.PurchaseResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PurchaseResponse_success(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Success, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PurchaseResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PurchaseResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PurchaseResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.PurchaseResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PurchaseResponse_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PurchaseResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PurchaseResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
 	}
 	return fc, nil
 }
@@ -2974,6 +3242,57 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "purchaseCatalog":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_purchaseCatalog(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var purchaseResponseImplementors = []string{"PurchaseResponse"}
+
+func (ec *executionContext) _PurchaseResponse(ctx context.Context, sel ast.SelectionSet, obj *model.PurchaseResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, purchaseResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PurchaseResponse")
+		case "success":
+			out.Values[i] = ec._PurchaseResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._PurchaseResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3538,6 +3857,20 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 func (ec *executionContext) unmarshalNNewCatalog2catalogᚋgraphᚋmodelᚐNewCatalog(ctx context.Context, v interface{}) (model.NewCatalog, error) {
 	res, err := ec.unmarshalInputNewCatalog(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPurchaseResponse2catalogᚋgraphᚋmodelᚐPurchaseResponse(ctx context.Context, sel ast.SelectionSet, v model.PurchaseResponse) graphql.Marshaler {
+	return ec._PurchaseResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPurchaseResponse2ᚖcatalogᚋgraphᚋmodelᚐPurchaseResponse(ctx context.Context, sel ast.SelectionSet, v *model.PurchaseResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PurchaseResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

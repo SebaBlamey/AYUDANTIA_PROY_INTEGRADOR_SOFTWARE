@@ -24,6 +24,12 @@ type Query {
   catalog(id: ID!): Catalog!
 }
 
+type PurchaseResponse{
+  success: Boolean!
+  message: String!
+}
+
 type Mutation {
   createCatalog(input: NewCatalog!): Catalog!
+  purchaseCatalog(userId: ID!, catalogId: ID!, quantity: Int!): PurchaseResponse!
 }

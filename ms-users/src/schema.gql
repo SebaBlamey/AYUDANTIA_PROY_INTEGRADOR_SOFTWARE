@@ -8,6 +8,7 @@ type User {
   email: String!
   password: String!
   isActive: Boolean!
+  purchase: [String!]!
 }
 
 type Query {
@@ -17,6 +18,7 @@ type Query {
 
 type Mutation {
   createUser(createUserDto: CreateUserDto!): User!
+  purchaseCatalog(purchaseCatalogInput: PurchaseInput!): Boolean!
   updateUser(id: Float!, updateUserDto: CreateUserDto!): User!
 }
 
@@ -24,4 +26,10 @@ input CreateUserDto {
   name: String!
   email: String!
   password: String!
+}
+
+input PurchaseInput {
+  userId: Float!
+  catalogId: String!
+  quantity: Float!
 }

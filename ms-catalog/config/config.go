@@ -2,6 +2,7 @@ package config
 
 import (
 	"catalog/graph/model"
+	"encoding/json"
 	"log"
 
 	"github.com/streadway/amqp"
@@ -59,6 +60,72 @@ func initRabbitMQ() {
 		log.Fatalf("failed to declare a queue: %v", err)
 	}
 	log.Println("RabbitMQ queue connected")
+
+	go consumePurchaseMessage()
+}
+
+func consumePurchaseMessage() {
+	msgs, err := RabbitChannel.Consume(
+		"purchaseQueue",
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		log.Fatalf("failed to consume a message: %v", err)
+	}
+	for msg := range msgs {
+		HandlePurchaseMessage(msg.Body)
+	}
+}
+
+type IncommingMessage struct {
+	Pattern string          `json:"pattern"`
+	Data    PurchaseMessage `json:"data"`
+	ID      string          `json:"id"`
+}
+
+type PurchaseMessage struct {
+	UserID    int    `json:"userId"`
+	CatalogID string `json:"catalogId"`
+	Quantity  int    `json:"quantity"`
+}
+
+func HandlePurchaseMessage(body []byte) {
+	log.Printf("Received message: %s", body)
+	var incommingMessage IncommingMessage
+
+	err := json.Unmarshal(body, &incommingMessage)
+	if err != nil {
+		log.Fatalf("failed to unmarshal JSON: %v", err)
+	}
+
+	purchase := incommingMessage.Data
+	log.Println("Purchase data: ", purchase)
+
+	if purchase.CatalogID == "" {
+		log.Println("Catalog ID is empty")
+		return
+	}
+
+	var catalog model.Catalog
+	if err := DB.Where("id = ?", purchase.CatalogID).First(&catalog).Error; err != nil {
+		log.Println("Catalog not found")
+		return
+	}
+	if catalog.Stock > 0 {
+		catalog.Stock -= purchase.Quantity
+		if err := DB.Save(&catalog).Error; err != nil {
+			log.Print("Failed to update catalog")
+		} else {
+			log.Println("Catalog stock updated")
+		}
+	} else {
+		log.Println("Catalog out of stock")
+	}
 }
 
 func PublishMessage(message string) error {
