@@ -13,7 +13,7 @@ type User {
 
 type Query {
   GetAllUsers: [User!]!
-  user: User!
+  user(id: String!): User!
 }
 
 type Mutation {

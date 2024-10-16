@@ -1,0 +1,54 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: Float!
+  name: String!
+  email: String!
+  password: String!
+  isActive: Boolean!
+  purchase: [String!]!
+}
+
+type Catalog {
+  id: ID!
+  name: String!
+  description: String!
+  stock: Float!
+  price: Float!
+  image: String!
+}
+
+type Query {
+  findAll: [User!]!
+  findOne(id: String!): User!
+  findAllCatalog: [Catalog!]!
+  findOneCatalog(id: String!): Catalog!
+}
+
+type Mutation {
+  createUser(createUserDto: CreateUserDto!): User!
+  purchaseCatalog(purchaseCatalogDto: PurchaseCatalogDto!): Boolean!
+  createCatalog(createCatalogDto: CreateCatalogDto!): Catalog!
+}
+
+input CreateUserDto {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input PurchaseCatalogDto {
+  catalogId: String!
+  quantity: Float!
+  userId: Float!
+}
+
+input CreateCatalogDto {
+  name: String!
+  description: String!
+  stock: Float!
+  price: Float!
+  image: String!
+}

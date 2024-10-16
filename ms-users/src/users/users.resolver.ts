@@ -15,7 +15,7 @@ export class UsersResolver {
   }
 
   @Query(() => User, { name: "user" })
-  async getUserById(id: string) {
+  async getUserById(@Args("id") id: string) {
     return await this.usersService.findOne(+id);
   }
 
