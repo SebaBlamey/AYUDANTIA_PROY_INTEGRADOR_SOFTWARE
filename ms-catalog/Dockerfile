@@ -1,18 +1,16 @@
-FROM golang:1.23.1 AS builder
+FROM golang:latest
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY go.mod go.sum ./
+
 RUN go mod download
 
+# Copy the rest of the application code
 COPY . .
 
-RUN go build -o catalog-service .
-
-FROM alpine:latest
-
-COPY --from=builder /app/catalog-service /usr/local/bin/catalog-service
+RUN go build -o ms-catalog
 
 EXPOSE 8080
 
-CMD ["catalog-service"]
+CMD ["./ms-catalog"]

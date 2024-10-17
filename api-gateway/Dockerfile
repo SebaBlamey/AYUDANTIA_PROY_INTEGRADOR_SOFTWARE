@@ -1,13 +1,16 @@
-FROM node:18
+FROM node:latest
 
 WORKDIR /usr/src/app
 
-COPY ./yarn.lock ./
+COPY package.json yarn.lock ./
 
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
+# Copy the rest of the application code
 COPY . .
 
-EXPOSE 4000
+RUN yarn build
 
-CMD ["yarn", "start:prod"]
+EXPOSE 3001
+
+CMD ["node", "dist/main.js"]

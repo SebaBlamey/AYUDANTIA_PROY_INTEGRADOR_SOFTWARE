@@ -1,5 +1,9 @@
 version: "3.8"
 
+networks:
+  my-network:
+    driver: bridge
+
 services:
   user_postgres:
     image: postgres:latest
@@ -13,6 +17,8 @@ services:
     volumes:
       - user_postgres_data:/var/lib/postgresql/data
     restart: always
+    networks:
+      - my-network
 
   catalog_postgres:
     image: postgres:latest
@@ -26,6 +32,8 @@ services:
     volumes:
       - catalog_postgres_data:/var/lib/postgresql/data
     restart: always
+    networks:
+      - my-network
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -37,6 +45,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     restart: always
+    networks:
+      - my-network
 
   ms-users:
     build:
@@ -51,6 +61,8 @@ services:
     ports:
       - "3000:3000"
     restart: always
+    networks:
+      - my-network
 
   ms-catalog:
     build:
@@ -65,6 +77,8 @@ services:
     ports:
       - "8080:8080"
     restart: always
+    networks:
+      - my-network
 
   api-gateway:
     build:
@@ -76,6 +90,8 @@ services:
     ports:
       - "4000:4000"
     restart: always
+    networks:
+      - my-network
 
 volumes:
   user_postgres_data:
