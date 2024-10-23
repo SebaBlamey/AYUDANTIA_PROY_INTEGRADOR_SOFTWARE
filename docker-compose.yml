@@ -63,6 +63,10 @@ services:
     restart: always
     networks:
       - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h user_postgres -p 5432 -U myuser"]
+      interval: 10s
+      retries: 5
 
   ms-catalog:
     build:
