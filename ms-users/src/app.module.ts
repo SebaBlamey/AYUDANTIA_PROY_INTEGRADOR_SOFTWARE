@@ -12,10 +12,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin
   imports: [
     TypeOrmModule.forRoot({
       type: "postgres",
-      host: "localhost",
-      username: "myuser",
-      password: "mypassword",
-      database: "users_db",
+      url: "postgres://myuser:mypassword@user_postgres:5432/users_db",
       entities: [User],
       port: 5433,
       autoLoadEntities: true,
@@ -32,4 +29,4 @@ import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin
   controllers: [],
   providers: [UsersResolver],
 })
-export class AppModule { }
+export class AppModule {}
